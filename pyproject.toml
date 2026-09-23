@@ -1,0 +1,30 @@
+[build-system]
+requires = [
+    "setuptools>=80.9.0,<82",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "docassemble.WVDelegationOfParentalAuthority"
+version = "0.0.1"
+description = "A docassemble project for DelegationofParentalAuthorityWestVirginia."
+readme = "README.md"
+authors = [
+    { name = "Alex Cieplik", email = "alex.cieplik@su.suffolk.edu" },
+]
+dependencies = [
+    "docassemble.ALAnyState @ git+https://github.com/SuffolkLITLab/docassemble-ALAnyState@main",
+    "docassemble.AssemblyLine @ git+https://github.com/SuffolkLITLab/docassemble-AssemblyLine.git@main",
+]
+license = "MIT"
+license-files = [
+    "LICENSE",
+]
+
+[project.urls]
+Homepage = "https://docassemble.org"
+
+[tool.setuptools.packages.find]
+where = [
+    ".",
+]

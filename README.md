@@ -1,2 +1,3 @@
-# docassemble-WVDelegationOfParentalAuthority
-A docassemble project for DelegationofParentalAuthorityWestVirginia.
+# docassemble.WVDelegationOfParentalAuthority
+
+A docassemble extension.
