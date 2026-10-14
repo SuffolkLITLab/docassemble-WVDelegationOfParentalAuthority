@@ -2,27 +2,28 @@
 include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.ALAnyState:any_state.yml
+  - docassemble.MassAccess:massaccess.yml
 ---
 metadata:
   title: >-
-    WVCode-§49-8-4-with-fields-with-fields
+    West-Virgina-Delegation-of-Parental-Authority
   short title: >-
-    WVCode-§49-8-4-with-field
-  description: |-
-    This form allows a parent or legal custodian to delegate their rights regarding the care and custody of a minor child to another individual. It ensures that the designee has the authority to make decisions about the child's education and medical care.
+    WV-Delegation
+  description: |
+    Use this form to let another adult take care of your child for up to 1 year. That adult can make choices about your child’s school and health care. You are still the parent, and you can cancel this at any time.
   can_I_use_this_form: |
-    You can use this form if you are a parent or legal custodian looking to temporarily delegate your parental rights to someone else. It's important to understand the limitations of the powers you are granting.
+    You can use this form if you are a parent or legal custodian of a child under 18. Use it if you need another adult to care for your child for a while, like if you are sick, in the military, working far away, or need to leave the country.
   before_you_start: |
-    ### Before you get started
-    - Gather the necessary information about yourself, the child, and the designee.
-    - Ensure you understand the powers you are delegating and any limitations.
+    ### Before you get started gather the following information
+    - Your child(ren)'s full name and birthday
+    - The caregiver's full name, address, and phone number(s)
+    - The dates you want this to start and end (up to 1 year)
 
     ### When you are finished
-    - Sign the form in the presence of a notary public.
-    - Provide a copy of the signed form to the designee and keep a copy for your records.
+    - You and the caregiver must sign the form in front of a notary. 
+    - Provide a copy of the signed form to the caregiver. Keep a copy for yourself.
   when_you_are_finished: |
-    After completing the form, ensure it is signed and notarized. You should provide copies to the designee and keep one for yourself. This will help in case you need to reference the delegated powers in the future.
-  efiling_enabled: False
+    Print the form. You and the other adult must sign it in front of a notary. Then give the other adult a copy and keep one for yourself. They may need to show it to your child’s school or doctor.  efiling_enabled: False
   integrated_efiling: False
   integrated_email_filing: False
   requires_notarization: True
@@ -77,16 +78,16 @@ code: |
   # These exact-name variables drive the reusable next-steps DOCX shell and
   # are editable in Weaver's AssemblyLine settings panel.
   al_next_steps_enabled = True
-  al_next_steps_intro_prompt = 'Delegate parental rights with this form'
-  al_next_steps_title = 'WVCode-§49-8-4-with-fields-with-fields'
-  al_next_steps_document_title = 'delegation'
+  al_next_steps_intro_prompt = "Your next steps"
+  al_next_steps_title = "West Virginia Delegation of Parental Authority"
+  al_next_steps_document_title = "power of attorney form"
   al_next_steps_document_purpose = 'delegation'
   al_next_steps_help_organization = 'West Virginia Department of Health and Human Resources'
   al_next_steps_help_url = 'https://dhhr.wv.gov'
   al_next_steps_generate_qr_code = False
-  al_next_steps_what_happens_next = 'After completing the form, ensure it is signed and notarized. You should provide copies to the designee and keep one for yourself. This will help in case you need to reference the delegated powers in the future.'
-  al_next_steps_what_can_decision_maker_do = "The designee will have the authority to make decisions regarding the child's education, health care, and other necessary matters as specified in the form."
-  al_next_steps_what_happens_if_i_win = 'If the delegation is successful, the child will receive the necessary care and support while you are unable to provide it. If issues arise, you can always reassess or revoke the delegation.'
+  al_next_steps_what_happens_next = "Keep your copy in a safe place\nThe form ends on the end date you picked. It can last up to 1 year"
+  al_next_steps_what_can_decision_maker_do = "The caregiver can only do the things you gave them power to do on the form\nThis may include signing your child up for school and agreeing to doctor visits\nThe caregiver cannot agree to your child's adoption or marriage"
+  al_next_steps_what_happens_if_i_win = "You can cancel this form at any time. If you do, tell the caregiver\nIf you need more time after the form ends, fill out a new one"
 ---
 objects:
   - children: ALPeopleList.using(there_are_any=True)
@@ -95,132 +96,182 @@ objects:
 ---
 sections:
   - about_you: About you
-  - people: People & contacts
-  - case_details: Case details
-  - sign_and_submit: Sign and submit
-  - review_wvcode4984withfieldswithfields: Review your answers
+  - children: Your children
+  - caregiver: The caregiver
+  - powers: Powers and dates
+  - review_wvcode4984withfields: Review and download
 ---
 #################### Interview order #####################
 comment: |
   Controls order and branching logic for questions specific to this form
-id: interview_order_wvcode4984withfieldswithfields
+id: interview_order_wvcode4984withfields
 mandatory: true
 code: |
-  wvcode4984withfieldswithfields_intro
-  nav.set_section('people')
+  wvcode4984withfields_intro
+  nav.set_section('about_you')
   users.gather()
   set_parts(subtitle=str(users))
-  delegate_all_powers
-  if not delegate_all_powers:
-    user1_designated_powers
-  set_progress(21)
-  designee1_address
-  power_start_month
-  user1_state
-  set_progress(42)
+  set_progress(15)
+  nav.set_section('children')
   children.gather()
   children[0].birthdate
   if children.number() > 1:
     children[1].birthdate
-  set_progress(62)
   if children.number() > 2:
     children[2].birthdate
+  set_progress(35)
+  nav.set_section('caregiver')
   designee.gather()
-  users[0].address.address
-  interview_order_wvcode4984withfieldswithfields = True
-  signature_date
-  signature_month
-  nav.set_section('sign_and_submit')
-  wvcode4984withfieldswithfields_preview_question
-  set_progress(83)
-  basic_questions_signature_flow
-  wvcode4984withfieldswithfields_download
+  designee[0].address.address
+  set_progress(55)
+  nav.set_section('powers')
+  delegate_all_powers
+  if not delegate_all_powers:
+    user1_designated_powers
+  power_start_month
+  set_progress(75)
+  interview_order_wvcode4984withfields = True
+  nav.set_section('review_wvcode4984withfields')
+  wvcode4984withfields_preview_question
+  set_progress(90)
+  wvcode4984withfields_download
+  
 ---
 id: background_information
-continue button field: wvcode4984withfieldswithfields_intro
-question: West Virginia Delegation of Parental Authority Form Background
-subquestion: |
-  ### Before you get started
-  - Gather the necessary information about yourself, the child, and the designee.
-  - Ensure you understand the powers you are delegating and any limitations.
-
-  ### When you are finished
-  - Sign the form in the presence of a notary public.
-  - Provide a copy of the signed form to the designee and keep a copy for your records.
-
-  You can use this form if you are a parent or legal custodian looking to temporarily delegate your parental rights to someone else. It's important to understand the limitations of the powers you are granting.
+continue button field: wvcode4984withfields_intro
+question: "About this form"
+subquestion: |2
+  ### What does this form do?
+  This form lets you pick another adult, as a caregiver, to take care of your child for up to 1 year. The caregiver can make choices about your child's school and health care. You are still the parent, and you can cancel this at any time.
+  
+  ### Before you start
+  Have this information ready:
+  
+  - Your child's full name and birthday
+  - The caregiver's full name, address, and phone numbers
+  - The dates you want this to start and end
+  
+  ### When you are done
+  - Check your answers and print the form.
+  - You and the caregiver must sign it in front of a notary.
+  - Give the caregiver a copy. Keep a copy for yourself.
 ---
 id: Designee Information
-question: |
-  Designee Information
+question: "Caregiver address and phone number"
 subquestion: |
-  Provide details about the designee.
+  Provide details about the caregiver.
 fields:
-  - "Designee one address details": designee1_address
-  - "Designee one home phone number": designee1_home_phone
-  - "Designee one work phone number": designee1_work_phone
+  - label: Street address
+    field: "designee[0].address.address"
+    address autocomplete: true
+  - label: Unit
+    field: "designee[0].address.unit"
+    required: False
+  - City: designee[0].address.city
+  - label: State
+    field: "designee[0].address.state"
+    code: "states_list(country_code=AL_DEFAULT_COUNTRY)"
+    default: "${ AL_DEFAULT_STATE }"
+  - Zip code: designee[0].address.zip
+  - Caregiver home phone number: designee1_home_phone
+  - label: Caregiver one work phone number
+    field: designee1_work_phone
+    required: False
 ---
 id: question_1789834170205
-question: Will you delegate all powers to the designee?
-subquestion: |
-  Choose Yes to delegate all powers. If you select No, please specify which powers you want to delegate on the next screen. If you choose to delegate all powers, the powers included in that will be as follows 
-  All of my power and authority regarding the care, custody and property of each minor child named above, including but not limited to 
-  *The right to enroll the child in school
-  *The right to inspect and obtain copies of education records and other records concerning the child
-  *The right to attend school activities and other functions concerning the child
-  *The right to give or withhold any consent or waiver with respect to school activities, 
-  *The right to give or withhold any consent or waiver with respect to medical and dental treatment
-  *The right to give or withhold any consent or waiver with respect to any other activity, function or treatment that may concern the child. 
-  What this does **Not Include* 
-  *The power or authority to consent to marriage or adoption of the child
-  *The performance or inducement of an abortion on or for the child,
-  *The termination of parental rights to the child
+question: "What do you want the caregiver to be able to do? "
+subquestion: |2
+  If you pick Yes, the caregiver will be able to do everything below. If you pick No, write in what you want the caregiver to be able to do.
+  
+  The caregiver can do the following things for your child(ren):
+
+  * Sign them up for school
+  * Get records from their school or other records 
+  * Go to school events for them
+  * Give permission for them to go to school events 
+  * Decide what medical and dental care they should have 
+  * Decide what other things they can or cannot do
+  
+  The caregiver cannot:
+
+  * Let the child be adopted or get married
+  * Let the child get an abortion
+  * End the rights you have as a parent
 fields:
-  - Delegate all powers to the designee: delegate_all_powers
+  - Let the caretaker do listed things: delegate_all_powers
     datatype: yesnoradio
 ---
 id: Delegated Powers
-question: |
-  Delegated Powers
-subquestion: Select the powers you are granting to the designee.
+question: "What should the caregiver be able to do for your child(ren)? "
+subquestion: "Pick what you want the caregiver to be able to do"
 fields:
   - User one designated powers granted: user1_designated_powers
     datatype: multiselect
     choices:
-      - The right to enroll the child in school
-      - The right to inspect and obtain copies of education records and other records concerning the child
-      - The right to attend school activities and other functions concerning the child
-      - "The right to give or withhold any consent or waiver with respect to school activities,"
-      - The right to give or withhold any consent or waiver with respect to medical and dental treatment
-      - "The right to give or withhold any consent or waiver with respect to any other activity, function or treatment that may concern the child."
+      - Sign them up for school
+      - Get records from their school or other records
+      - Go to school events for them
+      - Give permission for them to go to school events
+      - Decide what medical and dental care they should have
+      - Decide what other things they can or cannot do
 ---
 id: Power of Attorney Duration
-question: |
-  Power of Attorney Duration
-subquestion: |
-  Indicate the start and end dates for the power of attorney.
+question: "When can the caregiver start and stop making choices for your child?"
+subquestion: |2
+  If the start is immediately, today's date will be used as the start date. If you want it to begin later, choose the month and day it
+  should start. You can give the caregiver this power for 1 year or less.
 fields:
-  - "Power of attorney start month": power_start_month
-  - "Power of attorney start day": power_start_day
-  - "Power of attorney end month": power_end_month
-  - "Power of attorney end day": power_end_day
+  - "When should the caregiver start and stop making choices for your child? ": poa_start_type
+    datatype: radio
+    choices:
+      - {"Immediately (today, ${ today().format('MMMM d') })":"immediately"}
+      - {"On a future date I choose":"future"}
+  - label: Start month
+    field: poa_future_start_month
+    datatype: dropdown
+    code: "poa_month_choices"
+    show if: {"is":"future","variable":"poa_start_type"}
+  - label: Start day
+    field: poa_future_start_day
+    datatype: integer
+    show if: {"is":"future","variable":"poa_start_type"}
+    min: 1
+    max: 31
+  - label: End month
+    field: power_end_month
+    datatype: dropdown
+    code: "poa_month_choices"
+  - label: End day
+    field: power_end_day
+    datatype: integer
+    min: 1
+    max: 31
+validation code: |
+  if poa_start_type == 'future' and poa_future_start_day > poa_days_in_month[poa_future_start_month]:
+    validation_error(poa_future_start_month + ' only has ' + str(poa_days_in_month[poa_future_start_month]) + ' days.', field='poa_future_start_day')
+  if power_end_day > poa_days_in_month[power_end_month]:
+    validation_error(power_end_month + ' only has ' + str(poa_days_in_month[power_end_month]) + ' days.', field='power_end_day')
 ---
-id: Signature Information
-question: |
-  Signature Information
-subquestion: |
-  Provide the date of signature on the document.
-fields:
-  - "Month of signature on document": signature_month
-  - "Year of signature on document": signature_year
+comment: |
+  Month names and the most days each month can have (February allows 29 for leap years).
+code: |
+  poa_days_in_month = {
+    'January': 31, 'February': 29, 'March': 31, 'April': 30,
+    'May': 31, 'June': 30, 'July': 31, 'August': 31,
+    'September': 30, 'October': 31, 'November': 30, 'December': 31,
+  }
+  poa_month_choices = list(poa_days_in_month.keys())
 ---
-id: User Information
-question: |
-  User Information
-subquestion: |
-  Enter your state of residence.
-fields:
-  - "User one state of residence": user1_state
+comment: |
+  If the delegation is immediately effective, the start date is today.
+  Otherwise it is the future month and day the user chose.
+code: |
+  if poa_start_type == 'immediately':
+    power_start_month = today().format('MMMM')
+    power_start_day = today().day
+  else:
+    power_start_month = poa_future_start_month
+    power_start_day = poa_future_start_day
 ---
 comment: |
   The questions below are copies of the questions in AssemblyLine's
@@ -251,17 +302,26 @@ fields:
   - no label: children.there_is_another
     datatype: yesnoradio
 ---
+id: children max 3
+comment: |
+  The PDF only has room for 3 children. After 3, stop asking
+  "Is there another child?". Below 3, this block does nothing and
+  the "another child" question is asked as usual.
+code: |
+  if len(children.elements) >= 3:
+    children.there_is_another = False
+---
 id: designee names
 sets:
   - designee[i].name.first
   - designee[i].name.last
   - designee[i].name.middle
   - designee[i].name.suffix
-question: |
+question: |2
   % if hasattr(designee, 'ask_number') and designee.ask_number and designee.target_number == 1:
-  Name of designee
+  Name of caregiver
   % else:
-  Name of the ${ ordinal(i) } designee
+  Name of the ${ ordinal(i) } caregiver
   % endif
 fields:
   - code: |
@@ -286,193 +346,94 @@ fields:
   - code: |
       users[i].name_fields()
 ---
-id: user address
-sets:
-  - users[i].address.address
-  - users[i].address.city
-  - users[i].address.state
-  - users[i].address.zip
-  - users[i].address.unit
-  - users[i].address.country
+id: preview wvcode4984withfields
 question: |
-  % if i == 0 and al_person_answering == "user":
-  What is your address?
-  % else:
-  What is ${ users[i] }'s address?
-  % endif
-fields:
-  - label: |
-      % if i > 0 and al_person_answering == "user":
-      Same as your address
-      % else:
-      Same as ${ users[0] }'s address
-      % endif
-    field: users[i].address
-    datatype: object_radio
-    choices:
-      - users[0].address if defined("users[0].address.address") else None
-    object labeler: |
-      lambda y: y.on_one_line()
-    none of the above: |
-      Somewhere else
-    disable others: True
-    show if:
-      code: |
-        i > 0 and defined("users[0].address.address")
-  - code: |
-      users[i].address_fields(
-          country_code=AL_DEFAULT_COUNTRY, default_state=AL_DEFAULT_STATE
-      )
----
-id: preview wvcode4984withfieldswithfields
-question: |
-  Preview your form before you sign it
-subquestion: |
-  Here is a preview of the form you will sign on the next page.
-
+  Review your form
+subquestion: |2
+  Here is a preview of your completed form.
+  
   ${ al_recipient_bundle.as_pdf(key='preview') }
-
-  Open the form preview in a new tab. Use the "Edit answers" button to edit your
-  answers.
-
-  ${ action_button_html(url_action('review_wvcode4984withfieldswithfields'), label=word('Edit answers'), color='info') }
-
-  Return to this interview tab to continue and sign your form.
-continue button field: wvcode4984withfieldswithfields_preview_question
+  
+  Open the form preview in a new tab. Use the "Edit answers" button to edit your answers.
+  ${ action_button_html(url_action('review_wvcode4984withfields'), label=word('Edit answers'), color='info') }
+  
+  Return to this interview tab to continue and download your form. 
+  ## Do not sign it yet: you and the caregiver must sign it in front of a notary public.
+continue button field: wvcode4984withfields_preview_question
 ---
-code: |
-  signature_fields = ['users[0].signature', 'designee[0].signature']
----
-id: wvcode4984withfieldswithfields review screen
-event: review_wvcode4984withfieldswithfields
+id: wvcode4984withfields review screen
+event: review_wvcode4984withfields
 question: |
   Review your answers
 review:
   - Edit: users.revisit
     button: |
       **Users**
-
       % for item in users:
         * ${ item }
       % endfor
-  - Edit: designee1_address
+  - Edit: "designee[0].address.address"
     button: |
       **Designee Information**
-
-      Designee one address details: ${ showifdef('designee1_address') }
-
+      Designee one address details: ${ designee[0].address.on_one_line() if defined('designee[0].address.address') else '' }
       Designee one home phone number: ${ showifdef('designee1_home_phone') }
-
       Designee one work phone number: ${ showifdef('designee1_work_phone') }
   - Edit: delegate_all_powers
     button: |
       **Delegated Powers**
-
       Delegate all powers: ${ "Yes" if showifdef('delegate_all_powers') else "No" }
   - Edit: user1_designated_powers
-    show if: not delegate_all_powers
     button: |
       **Delegated Powers**
-
       User one designated powers granted: ${ showifdef('user1_designated_powers') }
-  - Edit: power_start_month
+    show if: not delegate_all_powers
+  - Edit:
+    - poa_start_type
+    - recompute
     button: |
       **Power of Attorney Duration**
-
-      Power of attorney start month: ${ showifdef('power_start_month') }
-
-      Power of attorney start day: ${ showifdef('power_start_day') }
-
-      Power of attorney end month: ${ showifdef('power_end_month') }
-
-      Power of attorney end day: ${ showifdef('power_end_day') }
-  - Edit: signature_month
-    button: |
-      **Signature Information**
-
-      Month of signature on document: ${ showifdef('signature_month') }
-
-      Year of signature on document: ${ showifdef('signature_year') }
-  - Edit: user1_state
-    button: |
-      **User Information**
-
-      User one state of residence: ${ showifdef('user1_state') }
+      Starts: ${ 'Immediately' if showifdef('poa_start_type') == 'immediately' else 'On a future date' } (${ showifdef('power_start_month') } ${ showifdef('power_start_day') })
+      Ends: ${ showifdef('power_end_month') } ${ showifdef('power_end_day') }
   - Edit: children.revisit
     button: |
       **Children**
-
       % for item in children:
         * ${ item }
       % endfor
   - Edit: designee.revisit
     button: |
       **Designee**
-
       % for item in designee:
         * ${ item }
       % endfor
-  - Edit: designee1_address
+  - Edit: "designee[0].address.address"
     button: |
       **Designee one address details**
-
-      Designee one address details: ${ showifdef('designee1_address') }
+      Designee one address details: ${ designee[0].address.on_one_line() if defined('designee[0].address.address') else '' }
   - Edit: designee1_home_phone
     button: |
       **Designee one home phone number**
-
       Designee one home phone number: ${ showifdef('designee1_home_phone') }
   - Edit: designee1_work_phone
     button: |
       **Designee one work phone number**
-
       Designee one work phone number: ${ showifdef('designee1_work_phone') }
   - Edit: delegate_all_powers
     button: |
       **Delegate all powers**
-
       Delegate all powers: ${ "Yes" if showifdef('delegate_all_powers') else "No" }
   - Edit: user1_designated_powers
-    show if: not delegate_all_powers
     button: |
       **User one designated powers granted**
-
       User one designated powers granted: ${ showifdef('user1_designated_powers') }
-  - Edit: power_start_month
+    show if: not delegate_all_powers
+  - Edit:
+    - poa_start_type
+    - recompute
     button: |
-      **Power of attorney start month**
-
-      Power of attorney start month: ${ showifdef('power_start_month') }
-  - Edit: power_start_day
-    button: |
-      **Power of attorney start day**
-
-      Power of attorney start day: ${ showifdef('power_start_day') }
-  - Edit: power_end_month
-    button: |
-      **Power of attorney end month**
-
-      Power of attorney end month: ${ showifdef('power_end_month') }
-  - Edit: power_end_day
-    button: |
-      **Power of attorney end day**
-
-      Power of attorney end day: ${ showifdef('power_end_day') }
-  - Edit: signature_month
-    button: |
-      **Month of signature on document**
-
-      Month of signature on document: ${ showifdef('signature_month') }
-  - Edit: signature_year
-    button: |
-      **Year of signature on document**
-
-      Year of signature on document: ${ showifdef('signature_year') }
-  - Edit: user1_state
-    button: |
-      **User one state of residence**
-
-      User one state of residence: ${ showifdef('user1_state') }
+      **Power of Attorney Duration**
+      Starts: ${ 'Immediately' if showifdef('poa_start_type') == 'immediately' else 'On a future date' } (${ showifdef('power_start_month') } ${ showifdef('power_start_day') })
+      Ends: ${ showifdef('power_end_month') } ${ showifdef('power_end_day') }
 ---
 id: edit users
 continue button field: users.revisit
@@ -490,11 +451,8 @@ columns:
       row_item.name_full() if defined("row_item.name.first") else ""
   - Signature: |
       row_item.signature if defined("row_item.signature") else ""
-  - Address: |
-      row_item.address.block() if defined("row_item.address.county") else ""
 edit:
   - name.first
-  - address.county
 confirm: True
 ---
 id: edit children
@@ -504,7 +462,11 @@ question: |
 subquestion: |
   ${ children.table }
 
+  % if len(children) < 3:
   ${ children.add_action() }
+  % else:
+  This form has room for up to 3 children.
+  % endif
 ---
 table: children.table
 rows: children
@@ -518,10 +480,10 @@ edit:
   - birthdate
 confirm: True
 ---
-id: edit designee
+id: edit caregiver
 continue button field: designee.revisit
-question: |
-  Edit designee
+question: |2
+  Edit caregiver information
 subquestion: |
   ${ designee.table }
 
@@ -538,41 +500,56 @@ edit:
   - name.first
 confirm: True
 ---
-id: download wvcode4984withfieldswithfields
-event: wvcode4984withfieldswithfields_download
+id: download wvcode4984withfields
+event: wvcode4984withfields_download
 question: |
   All done
-subquestion: |
-  Thank you ${users}. Your form is ready to download and deliver.
-
+subquestion: |2
+  Thank you ${users[0].name.first}. Your form is ready to download and deliver.
+  
   Use the options on this page to view, download and send your form. Use the
   "Edit answers" button to fix any mistakes.
-
-  ${ action_button_html(url_action('review_wvcode4984withfieldswithfields'), label=word('Edit answers'), color='info') }
-
+  
+  ${ action_button_html(url_action('review_wvcode4984withfields'), label=word('Edit answers'), color='info') }
+  
   ${ al_user_bundle.download_list_html() }
-
+  
   ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
-
 progress: 100
 ---
 # ALDocument objects specify the metadata for each template
 objects:
-  - wvcode4984withfieldswithfields_Post_interview_instructions: ALDocument.using(filename="wvcode4984withfieldswithfields_next_steps.docx", enabled=al_next_steps_enabled, has_addendum=False)
-  - wvcode4984withfieldswithfields_attachment: ALDocument.using(filename="wvcode4984withfieldswithfields", enabled=True, has_addendum=False)
+  - wvcode4984withfields_Post_interview_instructions: ALDocument.using(
+        filename="wvcode4984withfields_next_steps.docx",
+        enabled=al_next_steps_enabled,
+        has_addendum=False
+      )
+  - wvcode4984withfields_attachment: ALDocument.using(
+        filename="wvcode4984withfields",
+        enabled=True,
+        has_addendum=False
+      )
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[wvcode4984withfieldswithfields_Post_interview_instructions, wvcode4984withfieldswithfields_attachment], filename="wvcode4984withfieldswithfields", enabled=True)
-  - al_recipient_bundle: ALDocumentBundle.using(elements=[wvcode4984withfieldswithfields_attachment], filename="wvcode4984withfieldswithfields", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(
+        elements=[wvcode4984withfields_Post_interview_instructions, wvcode4984withfields_attachment],
+        filename="wvcode4984withfields",
+        enabled=True
+      )
+  - al_recipient_bundle: ALDocumentBundle.using(
+        elements=[wvcode4984withfields_attachment],
+        filename="wvcode4984withfields",
+        enabled=True
+      )
 ---
-template: wvcode4984withfieldswithfields_Post_interview_instructions.title
+template: wvcode4984withfields_Post_interview_instructions.title
 content: |
   Instructions
 ---
-template: wvcode4984withfieldswithfields_attachment.title
+template: wvcode4984withfields_attachment.title
 content: |
-  WVCode-§49-8-4-with-fields-with-fields
+  Completed form
 ---
 template: al_user_bundle.title
 content: |
@@ -587,16 +564,16 @@ content: |
 # the value of `i` to show or hide the user's signature
 attachment:
   name: Post-interview-Instructions
-  filename: wvcode4984withfieldswithfields_next_steps
+  filename: wvcode4984withfields_next_steps
   docx template file: wvcode4984withfieldswithfields_next_steps.docx
-  variable name: wvcode4984withfieldswithfields_Post_interview_instructions[i]
+  variable name: wvcode4984withfields_Post_interview_instructions[i]
   skip undefined: True
   tagged pdf: True
 ---
 attachment:
-  name: wvcode4984withfieldswithfields
-  filename: wvcode4984withfieldswithfields
-  variable name: wvcode4984withfieldswithfields_attachment[i]
+  name: wvcode4984withfields
+  filename: wvcode4984withfields
+  variable name: wvcode4984withfields_attachment[i]
   skip undefined: True
   pdf template file: WVCode-49-8-4-with-fields-with-fields.pdf
   fields:
@@ -610,7 +587,7 @@ attachment:
       - "children3_name": ${ children[2] }
       - "designee1_name": ${ designee[0] }
       - "designee1_name__1": ${ designee[0] }
-      - "designee1_address": ${ designee1_address }
+      - "designee1_address": ${ designee[0].address.on_one_line() }
       - "designee1_home_phone": ${ designee1_home_phone }
       - "designee1_work_phone": ${ designee1_work_phone }
       - "user1_designated_powers": ${ "" if delegate_all_powers else comma_and_list(user1_designated_powers) }
@@ -618,10 +595,3 @@ attachment:
       - "power_end_month": ${ power_end_month }
       - "power_end_day": ${ power_end_day }
       - "power_start_day": ${ power_start_day }
-      - "user1_signature": ${ users[0].signature_if_final(i) }
-      - "designee1_signature": ${ designee[0].signature }
-      - "user1_state": ${ user1_state }
-      - "user1_county": ${ users[0].address.county }
-      - "signature_date": ${ signature_date.format() }
-      - "signature_year": ${ signature_year }
-      - "signature_month": ${ signature_month }
