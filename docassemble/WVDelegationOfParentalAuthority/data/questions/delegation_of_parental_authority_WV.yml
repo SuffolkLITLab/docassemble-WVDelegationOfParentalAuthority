@@ -6,7 +6,7 @@ include:
 ---
 metadata:
   title: >-
-    West-Virgina-Delegation-of-Parental-Authority
+    West Virgina Delegation of Parental Authority
   short title: >-
     WV-Delegation
   description: |
@@ -66,8 +66,7 @@ code: |
   github_repo_name = 'docassemble-Wvcode4984Withfieldswithfields'
 ---
 template: interview_short_title
-content: |
-  Delegate parental rights with this form
+content: "Let someone take care of your kids"
 ---
 code: |
   al_form_type = "other_form"
@@ -107,6 +106,7 @@ comment: |
 id: interview_order_wvcode4984withfields
 mandatory: true
 code: |
+  al_intro_screen
   wvcode4984withfields_intro
   nav.set_section('about_you')
   users.gather()
@@ -139,27 +139,33 @@ code: |
 ---
 id: background_information
 continue button field: wvcode4984withfields_intro
-question: "About this form"
+question: "Let someone look after your kids"
 subquestion: |2
   ### What does this form do?
-  This form lets you pick another adult, as a caregiver, to take care of your child for up to 1 year. The caregiver can make choices about your child's school and health care. You are still the parent, and you can cancel this at any time.
+  This form lets you pick another adult (the “caregiver”) to look after  child(ren) for up to one year. The caregiver can make choices about your child's school and health care. You are still the parent, and you can cancel this at any time.
   
+  ### Who can use this form?
+  You can use this form if: 
+  
+  - You are a parent, guardian, or legal custodian of one or more child(ren) under the age of 18
+  - Your children live in West Virginia
+  - You wish to pick someone to take care of your kids if you cannot
+    
   ### Before you start
   Have this information ready:
   
-  - Your child's full name and birthday
-  - The caregiver's full name, address, and phone numbers
-  - The dates you want this to start and end
+  - Your child(ren)'s full name(s) and birthday(s).
+  - The caregiver's full name, address, and phone numbers.
+  - The dates you want this power to start and end.
   
-  ### When you are done
+  ### When you are done with this tool
+  
   - Check your answers and print the form.
   - You and the caregiver must sign it in front of a notary.
   - Give the caregiver a copy. Keep a copy for yourself.
 ---
 id: Designee Information
-question: "Caregiver address and phone number"
-subquestion: |
-  Provide details about the caregiver.
+question: "${ designee[0].name.first }'s address and phone number"
 fields:
   - label: Street address
     field: "designee[0].address.address"
@@ -173,55 +179,47 @@ fields:
     code: "states_list(country_code=AL_DEFAULT_COUNTRY)"
     default: "${ AL_DEFAULT_STATE }"
   - Zip code: designee[0].address.zip
-  - Caregiver home phone number: designee1_home_phone
-  - label: Caregiver one work phone number
+  - "${ designee[0].name.first }'s home phone number": designee1_home_phone
+  - label: "${ designee[0].name.first }'s  work phone number"
     field: designee1_work_phone
     required: False
 ---
 id: question_1789834170205
-question: "What do you want the caregiver to be able to do? "
+question: "What should ${ designee[0].name.first } be able to do? "
 subquestion: |2
-  If you pick Yes, the caregiver will be able to do everything below. If you pick No, write in what you want the caregiver to be able to do.
+  If you want ${ designee[0].name.first } to do most things for your ${ children.as_noun('child') } that you do today, select **General Powers**. If you would like to pick what you want ${ designee[0].name.first } to be able to do for your ${ children.as_noun('child') }, select **I will pick** and write what you want ${ designee[0].name.first } to do for your ${ children.as_noun('child') }. 
   
-  The caregiver can do the following things for your child(ren):
-
-  * Sign them up for school
-  * Get records from their school or other records 
-  * Go to school events for them
-  * Give permission for them to go to school events 
-  * Decide what medical and dental care they should have 
-  * Decide what other things they can or cannot do
+  **If you pick general powers, the caregiver can do the following things for your ${ children.as_noun('child') }:**
   
-  The caregiver cannot:
-
-  * Let the child be adopted or get married
-  * Let the child get an abortion
+  * Deal with your ${ children.as_noun('child') }'s school, including enrolling them, giving permission for activities, and attending events
+  * Decide what medical and dental care your ${ children.as_noun('child') } should have 
+  * Decide what things they can do, like you do now
+  
+  **The caregiver cannot:**
+  
+  * Let your ${ children.as_noun('child') } be adopted or get married
+  * Let your ${ children.as_noun('child') } get an abortion
   * End the rights you have as a parent
 fields:
   - Let the caretaker do listed things: delegate_all_powers
-    datatype: yesnoradio
----
-id: Delegated Powers
-question: "What should the caregiver be able to do for your child(ren)? "
-subquestion: "Pick what you want the caregiver to be able to do"
-fields:
-  - User one designated powers granted: user1_designated_powers
-    datatype: multiselect
+    datatype: radio
     choices:
-      - Sign them up for school
-      - Get records from their school or other records
-      - Go to school events for them
-      - Give permission for them to go to school events
-      - Decide what medical and dental care they should have
-      - Decide what other things they can or cannot do
+      - General Powers: True
+      - I will pick: False
+  - label: "What do you want ${ designee[0].name.first } to be able to do?"
+    field: user1_designated_powers
+    datatype: area
+    show if:
+      variable: delegate_all_powers
+      is: False
 ---
 id: Power of Attorney Duration
-question: "When can the caregiver start and stop making choices for your child?"
+question: "When can the caregiver start and stop making choices for your ${ children.as_noun('child') }?"
 subquestion: |2
   If the start is immediately, today's date will be used as the start date. If you want it to begin later, choose the month and day it
   should start. You can give the caregiver this power for 1 year or less.
 fields:
-  - "When should the caregiver start and stop making choices for your child? ": poa_start_type
+  - "When should the caregiver start and stop making choices for your ${ children.as_noun('child') }? ": poa_start_type
     datatype: radio
     choices:
       - {"Immediately (today, ${ today().format('MMMM d') })":"immediately"}
@@ -285,15 +283,21 @@ sets:
   - children[i].name.last
   - children[i].name.middle
   - children[i].name.suffix
-question: |
+question: |2
   % if hasattr(children, 'ask_number') and children.ask_number and children.target_number == 1:
-  Name of child
+  Child's name
   % else:
   Name of the ${ ordinal(i) } child
   % endif
 fields:
   - code: |
       children[i].name_fields()
+---
+id: child birthday
+question: "When was ${ children[i].name.first } born?"
+fields:
+  - Birthday: children[i].birthdate
+    datatype: BirthDate
 ---
 id: another child
 question: |
@@ -319,7 +323,7 @@ sets:
   - designee[i].name.suffix
 question: |2
   % if hasattr(designee, 'ask_number') and designee.ask_number and designee.target_number == 1:
-  Name of caregiver
+  Who do you want to be the caregiver? 
   % else:
   Name of the ${ ordinal(i) } caregiver
   % endif
@@ -350,7 +354,10 @@ id: preview wvcode4984withfields
 question: |
   Review your form
 subquestion: |2
-  Here is a preview of your completed form.
+  
+  ## Here is a preview of your completed form. Do not sign it yet: you and the caregiver must sign it in front of a notary public.
+  
+  ${ collapse_template(find_a_notary_help) }
   
   ${ al_recipient_bundle.as_pdf(key='preview') }
   
@@ -358,81 +365,60 @@ subquestion: |2
   ${ action_button_html(url_action('review_wvcode4984withfields'), label=word('Edit answers'), color='info') }
   
   Return to this interview tab to continue and download your form. 
-  ## Do not sign it yet: you and the caregiver must sign it in front of a notary public.
 continue button field: wvcode4984withfields_preview_question
 ---
 id: wvcode4984withfields review screen
 event: review_wvcode4984withfields
 question: |
   Review your answers
+subquestion: |
+  Check that everything is correct. Click **Edit** to change an answer.
 review:
   - Edit: users.revisit
     button: |
-      **Users**
+      **You**
+
       % for item in users:
-        * ${ item }
+      * ${ item }
       % endfor
-  - Edit: "designee[0].address.address"
-    button: |
-      **Designee Information**
-      Designee one address details: ${ designee[0].address.on_one_line() if defined('designee[0].address.address') else '' }
-      Designee one home phone number: ${ showifdef('designee1_home_phone') }
-      Designee one work phone number: ${ showifdef('designee1_work_phone') }
-  - Edit: delegate_all_powers
-    button: |
-      **Delegated Powers**
-      Delegate all powers: ${ "Yes" if showifdef('delegate_all_powers') else "No" }
-  - Edit: user1_designated_powers
-    button: |
-      **Delegated Powers**
-      User one designated powers granted: ${ showifdef('user1_designated_powers') }
-    show if: not delegate_all_powers
-  - Edit:
-    - poa_start_type
-    - recompute
-    button: |
-      **Power of Attorney Duration**
-      Starts: ${ 'Immediately' if showifdef('poa_start_type') == 'immediately' else 'On a future date' } (${ showifdef('power_start_month') } ${ showifdef('power_start_day') })
-      Ends: ${ showifdef('power_end_month') } ${ showifdef('power_end_day') }
   - Edit: children.revisit
     button: |
-      **Children**
+      **Your ${ children.as_noun('child') }**
+
       % for item in children:
-        * ${ item }
+      * ${ item }
       % endfor
   - Edit: designee.revisit
     button: |
-      **Designee**
-      % for item in designee:
-        * ${ item }
-      % endfor
-  - Edit: "designee[0].address.address"
+      **Caregiver**
+
+      ${ designee[0] }
+  - Edit: designee[0].address.address
     button: |
-      **Designee one address details**
-      Designee one address details: ${ designee[0].address.on_one_line() if defined('designee[0].address.address') else '' }
-  - Edit: designee1_home_phone
-    button: |
-      **Designee one home phone number**
-      Designee one home phone number: ${ showifdef('designee1_home_phone') }
-  - Edit: designee1_work_phone
-    button: |
-      **Designee one work phone number**
-      Designee one work phone number: ${ showifdef('designee1_work_phone') }
+      **${ designee[0].name.first }'s address and phone numbers**
+
+      Address: ${ designee[0].address.on_one_line() if defined('designee[0].address.address') else '' }
+
+      Home phone: ${ showifdef('designee1_home_phone') }
+
+      Work phone: ${ showifdef('designee1_work_phone') }
   - Edit: delegate_all_powers
     button: |
-      **Delegate all powers**
-      Delegate all powers: ${ "Yes" if showifdef('delegate_all_powers') else "No" }
-  - Edit: user1_designated_powers
-    button: |
-      **User one designated powers granted**
-      User one designated powers granted: ${ showifdef('user1_designated_powers') }
-    show if: not delegate_all_powers
+      **What ${ designee[0].name.first } can do**
+
+      % if showifdef('delegate_all_powers'):
+      General Powers
+      % else:
+      You picked: ${ showifdef('user1_designated_powers') }
+      % endif
   - Edit:
     - poa_start_type
     - recompute
     button: |
-      **Power of Attorney Duration**
+      **When it starts and ends**
+
       Starts: ${ 'Immediately' if showifdef('poa_start_type') == 'immediately' else 'On a future date' } (${ showifdef('power_start_month') } ${ showifdef('power_start_day') })
+
       Ends: ${ showifdef('power_end_month') } ${ showifdef('power_end_day') }
 ---
 id: edit users
@@ -502,10 +488,13 @@ confirm: True
 ---
 id: download wvcode4984withfields
 event: wvcode4984withfields_download
-question: |
-  All done
+question: "Almost done "
 subquestion: |2
-  Thank you ${users[0].name.first}. Your form is ready to download and deliver.
+  Thank you ${users[0].name.first}. Your form is ready to download and print.
+  
+  **Your form is not finished yet.** You and the caregiver must both sign it in front of a notary public. Do not sign it until you are in front of the notary.
+  
+  ${ collapse_template(find_a_notary_help) }
   
   Use the options on this page to view, download and send your form. Use the
   "Edit answers" button to fix any mistakes.
@@ -532,32 +521,43 @@ objects:
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(
-        elements=[wvcode4984withfields_Post_interview_instructions, wvcode4984withfields_attachment],
-        filename="wvcode4984withfields",
-        enabled=True
-      )
-  - al_recipient_bundle: ALDocumentBundle.using(
-        elements=[wvcode4984withfields_attachment],
-        filename="wvcode4984withfields",
-        enabled=True
-      )
+  - al_user_bundle: ALDocumentBundle.using(elements=[wvcode4984withfields_Post_interview_instructions, wvcode4984withfields_attachment], filename="wvcode4984withfields", enabled=True)
+  - al_recipient_bundle: ALDocumentBundle.using(elements=[wvcode4984withfields_attachment], filename="wvcode4984withfields", enabled=True)
 ---
 template: wvcode4984withfields_Post_interview_instructions.title
 content: |
-  Instructions
+  Next steps
 ---
 template: wvcode4984withfields_attachment.title
 content: |
-  Completed form
+  Filled form (signature still required)
 ---
 template: al_user_bundle.title
 content: |
-  All forms to download for your records
+  All forms to download for your records. Your form still needs to be signed in front of a notary.
 ---
 template: al_recipient_bundle.title
 content: |
   All forms to file
+---
+template: find_a_notary_help
+subject: |
+  How do I find a notary?
+content: |2
+  A notary is a person who watches you sign and verifies you are who you say you are. You and the caregiver must both sign this form in front of a notary.
+  
+  You can find a notary:
+  
+  * At most banks and credit unions. It is often free if you have an account there.
+  * At some shipping stores, libraries, and law offices.
+  * By using the [West Virginia notary search](https://apps.sos.wv.gov/business/notary). Pick your county to see notaries near you.
+  
+  **Before you go:**
+  
+  * Call ahead to make sure a notary will be there.
+  * Bring a photo ID, such as a license or a passport. The caregiver needs to bring one too.
+  * If you do not have one of these documents, you can bring one witnesses to swear you are who you say you are. The witness cannot be the caregiver.
+  * Do not sign the form until you are in front of the notary.
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the
 # same template is used for "preview" and "final" keys, and logic in the template checks
@@ -565,7 +565,7 @@ content: |
 attachment:
   name: Post-interview-Instructions
   filename: wvcode4984withfields_next_steps
-  docx template file: wvcode4984withfieldswithfields_next_steps.docx
+  docx template file: wvcode4984withfieldswithfields_next_steps_1.docx
   variable name: wvcode4984withfields_Post_interview_instructions[i]
   skip undefined: True
   tagged pdf: True
