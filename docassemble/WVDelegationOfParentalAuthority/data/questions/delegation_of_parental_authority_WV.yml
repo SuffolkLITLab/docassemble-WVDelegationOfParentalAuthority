@@ -6,7 +6,7 @@ include:
 ---
 metadata:
   title: >-
-    West Virgina Delegation of Parental Authority
+    West Virginia Delegation of Parental Authority
   short title: >-
     WV-Delegation
   description: |
@@ -114,11 +114,8 @@ code: |
   set_progress(15)
   nav.set_section('children')
   children.gather()
-  children[0].birthdate
-  if children.number() > 1:
-    children[1].birthdate
-  if children.number() > 2:
-    children[2].birthdate
+  for child in children:
+    child.birthdate
   set_progress(35)
   nav.set_section('caregiver')
   designee.gather()
@@ -147,9 +144,9 @@ subquestion: |2
   ### Who can use this form?
   You can use this form if: 
   
-  - You are a parent, guardian, or legal custodian of one or more child(ren) under the age of 18
-  - Your children live in West Virginia
-  - You wish to pick someone to take care of your kids if you cannot
+  - You are a parent, guardian, or legal custodian of one or more child(ren) under the age of 18.
+  - Your children live in West Virginia.
+  - You wish to pick someone to take care of your kids if you cannot.
     
   ### Before you start
   Have this information ready:
@@ -187,25 +184,25 @@ fields:
 id: question_1789834170205
 question: "What should ${ designee[0].name.first } be able to do? "
 subquestion: |2
-  If you want ${ designee[0].name.first } to do most things for your ${ children.as_noun('child') } that you do today, select **General Powers**. If you would like to pick what you want ${ designee[0].name.first } to be able to do for your ${ children.as_noun('child') }, select **I will pick** and write what you want ${ designee[0].name.first } to do for your ${ children.as_noun('child') }. 
+  If you want ${ designee[0].name.first } to do most things for your ${ children.as_noun('child') } that you do today, select **General Powers**. If you would like to choose exactly what you want ${ designee[0].name.first } to be able to do for your ${ children.as_noun('child') }, select **Only the powers I list** and write them in in the box below.
   
-  **If you pick general powers, the caregiver can do the following things for your ${ children.as_noun('child') }:**
+  **If you pick general powers, ${ designee[0].name.first } can do the following things for your ${ children.as_noun('child') }:**
   
   * Deal with your ${ children.as_noun('child') }'s school, including enrolling them, giving permission for activities, and attending events
   * Decide what medical and dental care your ${ children.as_noun('child') } should have 
   * Decide what things they can do, like you do now
   
-  **The caregiver cannot:**
+  **${ designee[0].name.first } cannot:**
   
-  * Let your ${ children.as_noun('child') } be adopted or get married
-  * Let your ${ children.as_noun('child') } get an abortion
-  * End the rights you have as a parent
+  * Let your ${ children.as_noun('child') } be adopted or get married.
+  * Let your ${ children.as_noun('child') } get an abortion.
+  * End the rights you have as a parent.
 fields:
   - Let the caretaker do listed things: delegate_all_powers
     datatype: radio
     choices:
-      - General Powers: True
-      - I will pick: False
+      - {"General Powers":true}
+      - {"Only the powers I list":false}
   - label: "What do you want ${ designee[0].name.first } to be able to do?"
     field: user1_designated_powers
     datatype: area
@@ -214,12 +211,12 @@ fields:
       is: False
 ---
 id: Power of Attorney Duration
-question: "When can the caregiver start and stop making choices for your ${ children.as_noun('child') }?"
+question: "When can ${ designee[0].name.first } start and stop making choices for your ${ children.as_noun('child') }?"
 subquestion: |2
   If the start is immediately, today's date will be used as the start date. If you want it to begin later, choose the month and day it
   should start. You can give the caregiver this power for 1 year or less.
 fields:
-  - "When should the caregiver start and stop making choices for your ${ children.as_noun('child') }? ": poa_start_type
+  - "When should ${ designee[0].name.first } start and stop making choices for your ${ children.as_noun('child') }? ": poa_start_type
     datatype: radio
     choices:
       - {"Immediately (today, ${ today().format('MMMM d') })":"immediately"}
@@ -305,15 +302,6 @@ question: |
 fields:
   - no label: children.there_is_another
     datatype: yesnoradio
----
-id: children max 3
-comment: |
-  The PDF only has room for 3 children. After 3, stop asking
-  "Is there another child?". Below 3, this block does nothing and
-  the "another child" question is asked as usual.
-code: |
-  if len(children.elements) >= 3:
-    children.there_is_another = False
 ---
 id: designee names
 sets:
@@ -443,8 +431,8 @@ confirm: True
 ---
 id: edit children
 continue button field: children.revisit
-question: |
-  Edit children
+question: |2
+  Edit 
 subquestion: |
   ${ children.table }
 
@@ -519,10 +507,28 @@ objects:
         has_addendum=False
       )
 ---
+objects:
+  - children_addendum: ALDocument.using(
+        filename="children_addendum",
+        title="Children addendum",
+        enabled=children_need_addendum,
+        has_addendum=False
+      )
+---
+code: |
+  children_need_addendum = children.number() > 3
+---
+attachment:
+  name: Children addendum
+  filename: children_addendum
+  variable name: children_addendum[i]
+  skip undefined: True
+  docx template file: children_addendum.docx
+---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[wvcode4984withfields_Post_interview_instructions, wvcode4984withfields_attachment], filename="wvcode4984withfields", enabled=True)
-  - al_recipient_bundle: ALDocumentBundle.using(elements=[wvcode4984withfields_attachment], filename="wvcode4984withfields", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[wvcode4984withfields_Post_interview_instructions, wvcode4984withfields_attachment, children_addendum], filename="wvcode4984withfields", enabled=True)
+  - al_recipient_bundle: ALDocumentBundle.using(elements=[wvcode4984withfields_attachment, children_addendum], filename="wvcode4984withfields", enabled=True)
 ---
 template: wvcode4984withfields_Post_interview_instructions.title
 content: |
@@ -583,8 +589,8 @@ attachment:
       - "children1_birthdate": ${ children[0].birthdate.format() }
       - "children2_birthdate": ${ children[1].birthdate.format() }
       - "children2_name": ${ children[1] }
-      - "children3_birthdate": ${ children[2].birthdate.format() }
-      - "children3_name": ${ children[2] }
+      - "children3_birthdate": ${ "" if children_need_addendum else children[2].birthdate.format() }
+      - "children3_name": ${ "See addendum" if children_need_addendum else children[2] }
       - "designee1_name": ${ designee[0] }
       - "designee1_name__1": ${ designee[0] }
       - "designee1_address": ${ designee[0].address.on_one_line() }
