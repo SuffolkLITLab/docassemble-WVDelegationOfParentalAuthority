@@ -12,16 +12,12 @@ metadata:
   description: |
     Use this form to let another adult take care of your child for up to 1 year. That adult can make choices about your child’s school and health care. You are still the parent, and you can cancel this at any time. You must be working with a qualified nonprofit organization to use it.
   can_I_use_this_form: |
-    You can use this form if you are a parent or legal custodian of a child under 18 and a qualified nonprofit organization is helping you set this up. Use it if you need another adult to care for your child for a while, like if you are sick, in the military, working far away, or need to leave the country.
+    You can use this form if you are a parent, guardian, or legal custodian of a child under 18 and a qualified nonprofit organization is helping you set this up. Use it if you need another adult to care for your child for a while, like if you are sick, in the military, working far away, or need to leave the country.
   before_you_start: |
     ### Before you get started gather the following information
     - Your child(ren)'s full name and birthday
     - The caregiver's full name, address, and phone number(s)
     - The dates you want this to start and end (up to 1 year)
-
-    ### When you are finished
-    - You and the caregiver must sign the form in front of a notary. 
-    - Provide a copy of the signed form to the caregiver. Keep a copy for yourself.
   when_you_are_finished: |
     Print the form. You and the other adult must sign it in front of a notary. Then give the other adult a copy and keep one for yourself. They may need to show it to your child’s school or doctor.
   efiling_enabled: False
