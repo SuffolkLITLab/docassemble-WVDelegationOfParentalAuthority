@@ -515,7 +515,9 @@ question: |
 subquestion: |
   ${ users.table }
 
+  % if users.number_gathered() < 1:
   ${ users.add_action() }
+  % endif
 ---
 table: users.table
 rows: users
@@ -556,7 +558,9 @@ question: |2
 subquestion: |
   ${ designee.table }
 
+  % if designee.number_gathered() < 1:
   ${ designee.add_action() }
+  % endif
 ---
 table: designee.table
 rows: designee
