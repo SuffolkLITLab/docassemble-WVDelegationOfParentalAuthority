@@ -1,4 +1,11 @@
 ---
+translations:
+  - FamilySpanish04_es.xlsx
+---
+include:
+  - family_spanish_words.yml
+---
+---
 include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.ALAnyState:any_state.yml
@@ -44,8 +51,7 @@ metadata:
   typical_role: "unknown"
   al_weaver_version: "2.3.1"
   generated_on: "2026-09-16"
-  languages:
-    - en
+  languages: [en, es]
   jurisdiction: "NAM-US-US+WV"
   review_date: 2026-09-16
   form_titles:
@@ -73,20 +79,11 @@ code: |
 id: alweaver assemblyline settings
 initial: True
 code: |
-  # These exact-name variables drive the reusable next-steps DOCX shell and
-  # are editable in Weaver's AssemblyLine settings panel.
+  # Next-steps prose is maintained directly in the bilingual DOCX template.
   al_next_steps_enabled = True
-  al_next_steps_intro_prompt = "Your next steps"
-  al_next_steps_title = "West Virginia Delegation of Parental Authority"
-  al_next_steps_document_title = "power of attorney form"
-  al_next_steps_document_purpose = 'delegation'
   al_next_steps_help_organization = 'West Virginia Department of Health and Human Resources'
   al_next_steps_help_url = 'https://dhhr.wv.gov'
   al_next_steps_generate_qr_code = False
-  al_next_steps_nonprofit = nonprofit_name if defined('nonprofit_name') and nonprofit_name else 'the nonprofit helping you'
-  al_next_steps_what_happens_next = "Before you sign, " + al_next_steps_nonprofit + " must check the caregiver's background and train them\nBring a photo ID to the notary, like a license or passport. The caregiver needs one too\nAfter you sign, give a copy to " + al_next_steps_nonprofit + ". They keep it for 3 years\nThis form does not get filed with a court\nKeep your copy in a safe place\nThe form ends on the end date you picked. It can last up to 1 year from the start date"
-  al_next_steps_what_can_decision_maker_do = "The caregiver can only do the things you gave them power to do on the form\nThis may include signing your child up for school and agreeing to doctor visits\nThe caregiver cannot agree to your child's adoption, marriage or abortion, or end your rights as a parent"
-  al_next_steps_what_happens_if_i_win = "You can cancel this form at any time. If you do, tell the caregiver\nIf you need more time after the form ends, fill out a new one"
 ---
 objects:
   - children: ALPeopleList.using(there_are_any=True)
@@ -327,17 +324,17 @@ fields:
     max: 31
 validation code: |
   if poa_start_type == 'future' and poa_future_start_day > poa_days_in_month[poa_future_start_month]:
-    validation_error(poa_future_start_month + ' only has ' + str(poa_days_in_month[poa_future_start_month]) + ' days.', field='poa_future_start_day')
+    validation_error(word('{month} has only {days} days.').format(month=word(poa_future_start_month), days=poa_days_in_month[poa_future_start_month]), field='poa_future_start_day')
   if power_end_day > poa_days_in_month[power_end_month]:
-    validation_error(power_end_month + ' only has ' + str(poa_days_in_month[power_end_month]) + ' days.', field='power_end_day')
+    validation_error(word('{month} has only {days} days.').format(month=word(power_end_month), days=poa_days_in_month[power_end_month]), field='power_end_day')
   if poa_start_type == 'immediately':
-    poa_check_start_month = today().format('MMMM')
+    poa_check_start_month = today().format('MMMM', language='en')
     poa_check_start_day = today().day
   else:
     poa_check_start_month = poa_future_start_month
     poa_check_start_day = poa_future_start_day
   if power_end_month == poa_check_start_month and power_end_day == poa_check_start_day:
-    validation_error("The end date can't be the same as the start date. That would be longer than 1 year. Pick the day before, or earlier.", field='power_end_day')
+    validation_error(word("The end date can't be the same as the start date. That would be longer than 1 year. Pick the day before, or earlier."), field='power_end_day')
 ---
 comment: |
   Month names and the most days each month can have (February allows 29 for leap years).
@@ -347,14 +344,14 @@ code: |
     'May': 31, 'June': 30, 'July': 31, 'August': 31,
     'September': 30, 'October': 31, 'November': 30, 'December': 31,
   }
-  poa_month_choices = list(poa_days_in_month.keys())
+  poa_month_choices = [{'value': month, 'label': word(month)} for month in poa_days_in_month]
 ---
 comment: |
   If the delegation is immediately effective, the start date is today.
   Otherwise it is the future month and day the user chose.
 code: |
   if poa_start_type == 'immediately':
-    power_start_month = today().format('MMMM')
+    power_start_month = today().format('MMMM', language='en')
     power_start_day = today().day
   else:
     power_start_month = poa_future_start_month
@@ -391,7 +388,7 @@ fields:
     datatype: BirthDate
 validation code: |
   if children[i].birthdate > today():
-    validation_error("The birthday can't be in the future. Check the date and try again.")
+    validation_error(word("The birthday can't be in the future. Check the date and try again."))
   if children[i].birthdate.plus(years=18) <= today():
     validation_error(children[i].name.first + " is 18 or older. This form is only for children under 18. Once a child turns 18, they are an adult and make their own decisions, so a parent can't hand off their care. If the date is wrong, fix it. If it is right, click Undo and leave " + children[i].name.first + " off this form.")
 ---
@@ -525,12 +522,14 @@ table: users.table
 rows: users
 columns:
   - Name: |
-      row_item.name_full() if defined("row_item.name.first") else ""
+      row_item.name_full() if row_item.name.attribute_defined('first') else ""
   - Signature: |
-      row_item.signature if defined("row_item.signature") else ""
+      row_item.signature if row_item.attribute_defined('signature') else ""
 edit:
   - name.first
 confirm: True
+edit header: |
+  ${ word("Actions") }
 ---
 id: edit children
 continue button field: children.revisit
@@ -545,13 +544,15 @@ table: children.table
 rows: children
 columns:
   - Name: |
-      row_item.name_full() if defined("row_item.name.first") else ""
+      row_item.name_full() if row_item.name.attribute_defined('first') else ""
   - Birthdate: |
-      row_item.birthdate if defined("row_item.birthdate") else ""
+      row_item.birthdate if row_item.attribute_defined('birthdate') else ""
 edit:
   - name.first
   - birthdate
 confirm: True
+edit header: |
+  ${ word("Actions") }
 ---
 id: edit caregiver
 continue button field: designee.revisit
@@ -568,12 +569,14 @@ table: designee.table
 rows: designee
 columns:
   - Name: |
-      row_item.name_full() if defined("row_item.name.first") else ""
+      row_item.name_full() if row_item.name.attribute_defined('first') else ""
   - Signature: |
-      row_item.signature if defined("row_item.signature") else ""
+      row_item.signature if row_item.attribute_defined('signature') else ""
 edit:
   - name.first
 confirm: True
+edit header: |
+  ${ word("Actions") }
 ---
 id: download wvcode4984withfields
 event: wvcode4984withfields_download
@@ -689,10 +692,10 @@ attachment:
       - "user1_name": ${ users[0] }
       - "user1_name__1": ${ users[0] }
       - "children1_name": ${ children[0] }
-      - "children1_birthdate": ${ children[0].birthdate.format() }
-      - "children2_birthdate": ${ children[1].birthdate.format() }
+      - "children1_birthdate": ${ children[0].birthdate.format(language='en') }
+      - "children2_birthdate": ${ children[1].birthdate.format(language='en') }
       - "children2_name": ${ children[1] }
-      - "children3_birthdate": ${ "" if children_need_addendum else children[2].birthdate.format() }
+      - "children3_birthdate": ${ "" if children_need_addendum else children[2].birthdate.format(language='en') }
       - "children3_name": ${ "See addendum" if children_need_addendum else children[2] }
       - "designee1_name": ${ designee[0] }
       - "designee1_name__1": ${ designee[0] }
@@ -704,3 +707,12 @@ attachment:
       - "power_end_month": ${ power_end_month }
       - "power_end_day": ${ power_end_day }
       - "power_start_day": ${ power_start_day }
+
+---
+language: es
+sections:
+- about_you: Sobre usted
+- children: Sus hijos
+- caregiver: La persona cuidadora
+- powers: Facultades y fechas
+- review_wvcode4984withfields: Revisar y descargar
